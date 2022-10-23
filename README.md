@@ -12,7 +12,7 @@ Traverse the source h5 file and recreate groups and datasets under a new h5 file
 - *file_iter_o_name.c*
 Iterate over all objects (groups and datasets) under the h5 file and print their names with total execution time recorded. The metadata block size and specified and used in H5FOpen. 
 - *file_iter_l_name.c*
-Similar to above but iterate over links instead of objects. An extra step (H5Oget_info_by_name) is taken during iteration to explicitly retrieves object metadata. 
+Similar to above but iterate over links instead of objects. An extra step (H5Oget_info_by_name) is taken during iteration to explicitly retrieve object metadata. 
 
 
 
