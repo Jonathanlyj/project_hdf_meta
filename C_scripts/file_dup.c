@@ -14,8 +14,8 @@
 #include <unistd.h>
 #include <string.h>
 
-#define FILE       "train64.h5"
-#define DESTFILE   "train64_new.h5"
+// #define FILE       "train64.h5"
+// #define DESTFILE   "train64_new.h5"
 
 /*
  * Define operator data structure type for H5Literate callback.
@@ -153,7 +153,7 @@ herr_t op_func (hid_t loc_id, const char *name, const H5L_info_t *info,
                 // file doesn't exist
             }
             strcpy(group_name, name);
-            // strcat(group_name, name);
+
             d_group = H5Gcreate (d_file, group_name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
             status = H5Gclose (d_group);
             status = H5Fclose (d_file);
@@ -201,12 +201,9 @@ herr_t op_func (hid_t loc_id, const char *name, const H5L_info_t *info,
         case H5O_TYPE_DATASET:
             printf ("Dataset: %s\n", name);
             d_file = H5Fopen(DESTFILE, H5F_ACC_RDWR, H5P_DEFAULT);
-            // s_file = H5Fopen(FILE, H5F_ACC_RDWR, H5P_DEFAULT);
             d_group = H5Gopen(d_file, group_name, H5P_DEFAULT);
-            // s_group = H5Gopen(file, group_name, H5P_DEFAULT);
 
-
-            H5Ocopy(loc_id, name, d_group, name, H5P_DEFAULT, H5P_DEFAULT);
+            H5Ocopy(loc_id, name, d_file, name, H5P_DEFAULT, H5P_DEFAULT);
 
 
             status = H5Gclose(d_group);
