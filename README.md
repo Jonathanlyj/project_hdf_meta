@@ -3,7 +3,17 @@
 - hdf5-1.10.9
 ### Intro
 The repo collects several programs in C or python that explores HDF5 API. The overall goal is to develop programs to tune metadata_block_size to optimize h5 file IO runtime.
-### Main Programs
+### Pipeline
+A shell script is developed to automate the following process
+1. Recreate target h5 file with different metadata block sizes as a parameter
+2. Read the new h5 file, iterate over all objects and print all object names
+3. Track I/O process for task 2 using darshan
+4. Locate the corresponding log file and parse the log  
+
+`block_size_test.sh` [target h5 file]  [metadata block size]  
+The current shell script requires the target h5 file existed under the top directory.
+
+### Main Programs (Outdated)
 Following C programs explore the sample h5 file achieved by HDF5 API. The current program requires target h5 file (name specified by FILE macro) existed under the same file directory.
 - `dset_dup.c`  
 Simply read the dataset of a 2d array (datatype known as float) from h5 file and rewrite to a new h5 file.
