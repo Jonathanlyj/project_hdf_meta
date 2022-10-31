@@ -1,6 +1,8 @@
 #include "hdf5.h"
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
+
 
 #define FILE       "train64.h5"
 #define META_BLOCK_SIZE  4096
@@ -16,35 +18,45 @@ herr_t print_link (hid_t loc_id, const char *name, const H5L_info_t *info,
 
 
 int
-main (void)
+main (int argc, char* argv[])
 {
-    hid_t           file, fapl;           
+    hid_t           file, file_fapl, new_file_fapl;           
     herr_t          status;
+    hsize_t block_size, new_block_size;
 
     clock_t start, end;
     double time_used;
-    /*
-     * Set metadata block size
-     */
-    fapl = H5Pcreate(H5P_FILE_ACCESS);
-    H5Pset_meta_block_size(fapl, META_BLOCK_SIZE);
+
+    if (argc < 3){
+        fprintf(stderr, "requires file name and block size \n");
+        exit(-1);
+    }
+
+    char* file_name = argv[1];
+    block_size = (int) atoi(argv[2]);
     /*
      * Open file
      */
-    file = H5Fopen (FILE, H5F_ACC_RDONLY, fapl);
+
+    file_fapl = H5Pcreate(H5P_FILE_ACCESS);
+    H5Pset_meta_block_size(file_fapl, block_size);
+    file = H5Fopen (file_name, H5F_ACC_RDONLY, file_fapl);
+
+
     
 
     /*
-     * Begin iteration using H5Lvisit
+     * Begin iteration using H5Ovisit
      */
-    printf ("Objects in the file:\n");
+    printf ("Links in the file:\n");
     start = clock();    
     status = H5Lvisit (file, H5_INDEX_NAME, H5_ITER_NATIVE, print_link, NULL);
-
     end = clock();
     time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-    printf("Metadata block size: %d\n", META_BLOCK_SIZE);
-    printf("Traverse took %f seconds to execute \n", time_used);
+    printf("Traverse %s took %f seconds to execute \n", file_name, time_used);
+    new_file_fapl = H5Fget_access_plist(file);
+    H5Pget_meta_block_size(new_file_fapl, &new_block_size);
+    printf("Metadata block size: %d\n", new_block_size);
 
     /*
      * Close and release resources.
@@ -57,7 +69,7 @@ main (void)
 
 /************************************************************
 
-  Operator function for H5Ovisit.  This function prints the
+  Operator function for H5Lvisit.  This function prints the
   name and type of the object passed to it.
 
  ************************************************************/

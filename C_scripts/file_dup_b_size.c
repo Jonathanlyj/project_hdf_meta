@@ -25,6 +25,7 @@ main (int argc, char* argv[])
     clock_t start, end;
     double time_used;
     hsize_t block_size;
+    hsize_t d_block_size;
 
     /*
      * Set metadata block size
@@ -58,9 +59,6 @@ main (int argc, char* argv[])
     H5Pset_meta_block_size(new_file_fapl, block_size);
     d_file_id = H5Fcreate (new_file, H5F_ACC_TRUNC, H5P_DEFAULT, new_file_fapl);
     printf("New file created with block size: %d\n", block_size);
-    d_file_fapl = H5Fget_access_plist(d_file_id);
-    H5Pget_meta_block_size(d_file_fapl, &block_size);
-    printf("Check new file metadata block size: %d\n", block_size);
     
     status = H5Fclose(d_file_id);
 
@@ -74,13 +72,17 @@ main (int argc, char* argv[])
     // time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     // printf("Metadata block size: %d\n", META_BLOCK_SIZE);
     // printf("Traverse took %f seconds to execute \n", time_used);
-
+    d_file_id = H5Fopen(new_file, H5F_ACC_RDWR, new_file_fapl);
+    d_file_fapl = H5Fget_access_plist(d_file_id);
+    H5Pget_meta_block_size(d_file_fapl, &d_block_size);
+    printf("Check new file metadata block size: %d\n", d_block_size);
 
 
     /*
      * Close and release resources.
      */
     status = H5Fclose (file_id);
+    status = H5Fclose(d_file_id);
 
 
     return 0;
