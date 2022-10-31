@@ -19,17 +19,10 @@ env LD_PRELOAD=/homes/yll6162/darshan/darshan-install/lib/libdarshan.so ./C_scri
 #find the darshan log created
 log_file=`find $DARSHAN_LOG_DIR -name "*file_iter_l_name*.darshan" -cmin -1 | sort -r | head -n 1`
 echo "Found log file: $log_file"
-#analyze darshan logs and generate report
+#analyze darshan logs and generate txt file for i/o statistics
+
 cd darshan_reports
-python3 -m darshan summary "$log_file"
-
-
-
-
-
-# echo "The file name: $0."
-# echo "The first argument is $1."
-# echo "The second argument is $2."
-# echo "The third argument is $3."
-
-
+# python3 -m darshan summary "$log_file"
+txt_file="file_iter_l_name_"${strarr[0]}"_"$2.txt
+darshan-parser "$log_file" > ./$txt_file
+echo "Generated parsed log txt: $txt_file"
