@@ -24,5 +24,6 @@ echo "Found log file: $log_file"
 cd darshan_reports
 # python3 -m darshan summary "$log_file"
 txt_file="file_iter_l_name_"${strarr[0]}"_"$2.txt
-darshan-parser "$log_file" > ./$txt_file
+setenv DXT_ENABLE_IO_TRACE 1
+darshan-dxt-parser "$log_file" > ./$txt_file
 echo "Generated parsed log txt: $txt_file"
