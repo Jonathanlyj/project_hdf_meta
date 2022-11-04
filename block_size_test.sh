@@ -19,11 +19,14 @@ env LD_PRELOAD=/homes/yll6162/darshan/darshan-install/lib/libdarshan.so ./C_scri
 #find the darshan log created
 log_file=`find $DARSHAN_LOG_DIR -name "*file_iter_l_name*.darshan" -cmin -1 | sort -r | head -n 1`
 echo "Found log file: $log_file"
-#analyze darshan logs and generate txt file for i/o statistics
+# analyze darshan logs and generate txt file for i/o statistics
 
 cd darshan_reports
 # python3 -m darshan summary "$log_file"
-txt_file="file_iter_l_name_"${strarr[0]}"_"$2.txt
-setenv DXT_ENABLE_IO_TRACE 1
-darshan-dxt-parser "$log_file" > ./$txt_file
+IFS='/'
+read -a new_strarr <<< ${strarr[0]}
+txt_file="file_iter_l_name_"${new_strarr[-1]}"_"$2.txt
+# export DXT_ENABLE_IO_TRACE=1
+
+env DXT_ENABLE_IO_TRACE=16 darshan-parser "$log_file" > ./$txt_file
 echo "Generated parsed log txt: $txt_file"

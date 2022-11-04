@@ -27,6 +27,9 @@ main (int argc, char* argv[])
     clock_t start, end;
     double time_used;
 
+    unsigned long flags;
+    const char* driver_info;
+
     if (argc < 3){
         fprintf(stderr, "requires file name and block size \n");
         exit(-1);
@@ -43,8 +46,6 @@ main (int argc, char* argv[])
     file = H5Fopen (file_name, H5F_ACC_RDONLY, file_fapl);
 
 
-    
-
     /*
      * Begin iteration using H5Ovisit
      */
@@ -57,6 +58,21 @@ main (int argc, char* argv[])
     new_file_fapl = H5Fget_access_plist(file);
     H5Pget_meta_block_size(new_file_fapl, &new_block_size);
     printf("Metadata block size: %d\n", new_block_size);
+
+    /*
+     * Get file driver info
+     */
+    hid_t driver = H5Pget_driver(new_file_fapl);
+    H5FDdriver_query (driver, &flags);
+    printf("query result: %x \n", flags);
+
+    
+
+    if (H5FD_SEC2==driver) {
+        printf("File driver: H5FD_SEC2\n");
+    } else if(H5FD_MULTI==driver){
+        printf("File driver: H5FD_MULTI\n");
+    }
 
     /*
      * Close and release resources.
@@ -78,7 +94,7 @@ herr_t print_link (hid_t loc_id, const char *name, const H5L_info_t *info,
 {
     herr_t          status;
     H5O_info_t      infobuf;
-    printf ("/");               /* Print root group in object path */
+    // printf ("/");               /* Print root group in object path */
 
 
 
@@ -89,10 +105,10 @@ herr_t print_link (hid_t loc_id, const char *name, const H5L_info_t *info,
     else
         switch (infobuf.type) {
             case H5O_TYPE_GROUP:
-                printf ("%s  (Group)\n", name);
+                // printf ("%s  (Group)\n", name);
                 break;
             case H5O_TYPE_DATASET:
-                printf ("%s  (Dataset)\n", name);
+                // printf ("%s  (Dataset)\n", name);
                 break;
             case H5O_TYPE_NAMED_DATATYPE:
                 printf ("%s  (Datatype)\n", name);
