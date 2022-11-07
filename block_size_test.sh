@@ -29,5 +29,5 @@ read -a new_strarr <<< ${strarr[0]}
 txt_file="file_iter_l_name_"${new_strarr[-1]}"_"$2.txt
 # export DXT_ENABLE_IO_TRACE=1
 
-env DXT_ENABLE_IO_TRACE=1 darshan-parser "$log_file" > ./$txt_file
+darshan-parser "$log_file" > ./$txt_file
 echo "Generated parsed log txt: $txt_file"
