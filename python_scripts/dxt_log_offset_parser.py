@@ -53,3 +53,14 @@ plt.savefig(img_name)
 
 
 
+# Save new offsets and lengths and reads to new txt file
+new_filename = filename.replace(".txt", "_coalesce.txt")
+with open(new_filename, "w") as f:
+    f.write("{:<15}".format("Segment"))
+    f.write("{:<15}".format("Offset"))
+    f.write("{:<15}\n".format("Length"))
+    for i in range(len(nonconsec_reads)):
+        f.write("{:<15}".format(i))
+        f.write("{:<15}".format(nonconsec_reads[i][0]))
+        f.write("{:<15}\n".format(nonconsec_reads[i][1]))
+        
