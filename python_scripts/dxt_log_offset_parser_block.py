@@ -16,6 +16,8 @@ def collapse(reads):
         i += 1
     return new_reads
 
+
+
 # test_reads = [(0, 8), (0, 16), (16, 80), (96, 512), (680, 512)]
 
 # print(collapse(test_reads))
@@ -33,7 +35,7 @@ for l in lines:
         strings = l.strip().split()
         # print(strings)
         reads.append((int(strings[4]), int(strings[5])))
-# reads = sorted(reads, key = lambda x: x[0])
+reads = sorted(reads, key = lambda x: x[0])
 nonconsec_reads = collapse(reads)
 print(f"number of nonconsec_read: {len(nonconsec_reads)}")
 print(f"number of consec_read: {len(reads) - len(nonconsec_reads)}")
@@ -55,11 +57,21 @@ block_offsets = [r[0] for r in nonconsec_reads]
 
 
 # nonconsec_reads = sorted(nonconsec_reads, key = lambda x: x[0])
-print(len(nonconsec_reads))
+# print(len(nonconsec_reads))
 
 
 # Save new offsets and lengths and reads to new txt file
-new_filename = filename.replace(".txt", "_coalesce.txt")
+new_filename = filename.replace(".txt", "_raw_sorted.txt")
+with open(new_filename, "w") as f:
+    f.write("{:<15}".format("Segment"))
+    f.write("{:<15}".format("Offset"))
+    f.write("{:<15}\n".format("Length"))
+    for i in range(len(reads)):
+        f.write("{:<15}".format(i))
+        f.write("{:<15}".format(reads[i][0]))
+        f.write("{:<15}\n".format(reads[i][1]))
+
+new_filename = filename.replace(".txt", "_coalesce_sorted.txt")
 with open(new_filename, "w") as f:
     f.write("{:<15}".format("Segment"))
     f.write("{:<15}".format("Offset"))
@@ -68,6 +80,8 @@ with open(new_filename, "w") as f:
         f.write("{:<15}".format(i))
         f.write("{:<15}".format(nonconsec_reads[i][0]))
         f.write("{:<15}\n".format(nonconsec_reads[i][1]))
+
+
 
 
         
