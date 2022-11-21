@@ -35,9 +35,9 @@ def merge_block(reads):
 
 
 
-test_reads = [(0, 8), (0, 16), (16, 80), (96, 512), (600, 512)]
+# test_reads = [(0, 8), (0, 16), (16, 80), (96, 512), (600, 512)]
 
-print(merge_block(test_reads))
+# print(merge_block(test_reads))
 
 filename = sys.argv[1]
  
