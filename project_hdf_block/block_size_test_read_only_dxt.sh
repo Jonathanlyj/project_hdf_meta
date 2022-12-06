@@ -18,7 +18,7 @@ h5cc C_scripts/file_iter_l_name.c -o C_scripts/file_iter_l_name
 env DARSHAN_ENABLE_NONMPI=1 LD_PRELOAD=/homes/yll6162/darshan/darshan-install/lib/libdarshan.so ./C_scripts/file_iter_l_name "$1" $2
 
 #find the darshan log created
-log_file=`find $DARSHAN_LOG_DIR -name "*file_iter_l_name*.darshan" -cmin -1 | sort -r | head -n 1`
+log_file=`find $DARSHAN_LOG_DIR -name "*file_iter_l_name*.darshan" -cmin -10 | sort -r | head -n 1`
 echo "Found log file: $log_file"
 # analyze darshan logs and generate txt file for i/o statistics
 
@@ -33,5 +33,5 @@ txt_file="file_iter_l_name_"${new_strarr[-1]}"_dxt".txt
 # export DXT_ENABLE_IO_TRACE=1
 
 
-darshan-dxt-parser --show-incomplete "$log_file" > ./$txt_file
+ darshan-dxt-parser "$log_file" > ./$txt_file
 echo "Generated parsed log txt: $txt_file"
