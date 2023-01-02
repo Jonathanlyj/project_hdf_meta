@@ -1,0 +1,44 @@
+[build-system]
+requires = [
+    "Cython>=0.29",
+    "oldest-supported-numpy",
+    "setuptools>=61",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pncpy"
+description = "Provides an object-oriented python interface to the PnetCDF library"
+readme = {text = """\
+something here
+""", content-type = "text/x-rst"}
+authors = [
+  {name = "auth1", email = "email1@email.com"},
+]
+requires-python = ">=3.7"
+keywords = [
+    "numpy", "pnetcdf", "data", "science", "network", "oceanography",
+    "meteorology", "climate",
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Archiving :: Compression",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+]
+dynamic = ["version"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
