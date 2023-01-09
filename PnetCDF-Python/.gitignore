@@ -2,7 +2,7 @@ build/
 *.pyc
 dist/
 *.egg-info/
-*/PnetCDF/_PnetCDF.c
+*/PnetCDF/*.c
 */PnetCDF/*.so
 include/constants.pyx
 netcdftime/_netcdftime.c
