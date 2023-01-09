@@ -40,5 +40,6 @@ cdef extern from "pnetcdf.h":
     int ncmpi_def_dim(int ncid, const char *name, MPI_Offset len, int *idp) nogil
     # Inquiry APIs
     int ncmpi_inq(int ncid, int *ndimsp, int *nvarsp, int *ngattsp, int *unlimdimidp) nogil
+    int ncmpi_inq_ndims(int ncid, int *ndimsp) nogil
     int ncmpi_inq_dimlen(int ncid, int dimid, MPI_Offset *lenp) nogil
     int ncmpi_inq_dimname(int ncid, int dimid, char *name) nogil

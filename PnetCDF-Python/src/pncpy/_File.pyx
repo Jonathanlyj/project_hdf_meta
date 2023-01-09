@@ -9,6 +9,11 @@ from mpi4py.libmpi cimport MPI_Comm, MPI_Info, MPI_Comm_dup, MPI_Info_dup, \
 #TODO: Fix utils function import crash error
 # from .utils cimport _strencode, _check_err
 
+from libc.string cimport memcpy, memset
+from libc.stdlib cimport malloc, free
+
+from ._Dimension cimport Dimension
+
 ctypedef MPI.Comm Comm
 ctypedef MPI.Info Info
 
@@ -85,9 +90,10 @@ cdef class File:
 
         _check_err(ierr, err_cls=OSError, filename=path)
         self._isopen = 1
-        self._def_mode_on = 0
+        self.def_mode_on = 0
         self._ncid=ncid
         self.data_model = format
+        self.dimensions = _get_dims(self)
     
     def close(self):
         self._close(True)
@@ -118,8 +124,8 @@ cdef class File:
     def _redef(self):
         cdef int ierr
         cdef int fileid= self._ncid
-        if not self._def_mode_on:
-            self._def_mode_on = 1
+        if not self.def_mode_on:
+            self.def_mode_on = 1
             with nogil:
                 ierr = ncmpi_redef(fileid)
     def enddef(self):
@@ -128,10 +134,50 @@ cdef class File:
     def _enddef(self):
         cdef int ierr
         cdef int fileid= self._ncid
-        if self._def_mode_on:
-            self._def_mode_on = 0
+        if self.def_mode_on:
+            self.def_mode_on = 0
             with nogil:
                 ierr = ncmpi_enddef(fileid)
+    def createDimension(self, dimname, size=None):
+        """
+        **`createDimension(self, dimname, size=None)`**
+        Creates a new dimension with the given `dimname` and `size`.
+        `size` must be a positive integer or `None`, which stands for
+        "unlimited" (default is `None`). Specifying a size of 0 also
+        results in an unlimited dimension. The return value is the `Dimension`
+        class instance describing the new dimension.  To determine the current
+        maximum size of the dimension, use the `len` function on the `Dimension`
+        instance. To determine if a dimension is 'unlimited', use the
+        `Dimension.isunlimited` method of the `Dimension` instance.
+        """
+        self.dimensions[dimname] = Dimension(self, dimname, size=size)
+
+
+cdef _get_dims(file):
+    # Private function to create `Dimension` instances for all the
+    # dimensions in a `File`
+    cdef int ierr, numdims, n, _file_id
+    cdef int *dimids
+    cdef char namstring[NC_MAX_NAME+1]
+    # get number of dimensions in this file.
+    _file_id = file._ncid
+    with nogil:
+        ierr = ncmpi_inq_ndims(_file_id, &numdims)
+    _check_err(ierr)
+    # create empty dictionary for dimensions.
+    dimensions = dict()
+    if numdims > 0:
+        dimids = <int *>malloc(sizeof(int) * numdims)
+        for n from 0 <= n < numdims:
+            dimids[n] = n
+        for n from 0 <= n < numdims:
+            with nogil:
+                ierr = ncmpi_inq_dimname(_file_id, dimids[n], namstring)
+            _check_err(ierr)
+            name = namstring.decode('utf-8')
+            dimensions[name] = Dimension(file = file, name = name, id=dimids[n])
+        free(dimids)
+    return dimensions
 
 #TODO: remove utils functions after import error fixed
 cdef _strencode(pystr,encoding=None):

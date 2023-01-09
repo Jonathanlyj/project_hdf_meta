@@ -4,13 +4,14 @@ cimport mpi4py.MPI as MPI
 ctypedef MPI.Offset Offset
 #TODO: Fix utils function import crash error
 # from .utils cimport _strencode, _check_err
-
+from libc.string cimport memcpy, memset
+from libc.stdlib cimport malloc, free
 from mpi4py.libmpi cimport MPI_Offset
 
 include "PnetCDF.pxi"
 
 cdef class Dimension:
-    def __init__(self, File file, name, Offset size, **kwargs):
+    def __init__(self, File file, name, size=None, **kwargs):
         self._id = 0
         self._file = file
         """
@@ -20,13 +21,12 @@ cdef class Dimension:
         **`name`**: Name of the dimension.
         **`size`**: Size of the dimension. `None` or 0 means unlimited. (Default `None`).
         ***Note***: `Dimension` instances should be created using the
-        `Dataset.createDimension` method of a `Group` or
-        `Dataset` instance, not using `Dimension.__init__` directly.
+        `Dataset.createDimension` method of a `File` instance, not using `Dimension.__init__` directly.
         """
         cdef int ierr
         cdef char *dimname
         cdef MPI_Offset lendim
-        self._fileid = file._ncid
+        self._file_id = file._ncid
         self._data_model = file.data_model
         self._name = name
 
@@ -40,19 +40,23 @@ cdef class Dimension:
                 lendim = size
             else:
                 lendim = NC_UNLIMITED
-            file.redef()
-            with nogil:
-                ierr = ncmpi_def_dim(self._fileid, dimname, lendim, &self._id)
-            file.enddef()
+            if not file.def_mode_on:
+                file.redef()
+                with nogil:
+                    ierr = ncmpi_def_dim(self._file_id, dimname, lendim, &self._id)
+                file.enddef()
+            else:
+                with nogil:
+                    ierr = ncmpi_def_dim(self._file_id, dimname, lendim, &self._id)
             _check_err(ierr)
 
     def _getname(self):
         # private method to get name associated with instance.
-        cdef int err, _fileid
+        cdef int err, _file_id
         cdef char namstring[NC_MAX_NAME+1]
 
         with nogil:
-            ierr = ncmpi_inq_dimname(self._fileid, self._id, namstring)
+            ierr = ncmpi_inq_dimname(self._file_id, self._id, namstring)
         _check_err(ierr)
         return namstring.decode('utf-8')
 
@@ -88,7 +92,7 @@ cdef class Dimension:
         cdef int ierr
         cdef MPI_Offset lengthp
         with nogil:
-            ierr = ncmpi_inq_dimlen(self._fileid, self._id, &lengthp)
+            ierr = ncmpi_inq_dimlen(self._file_id, self._id, &lengthp)
         _check_err(ierr)
         return lengthp
 
@@ -107,7 +111,7 @@ returns `True` if the `Dimension` instance is unlimited, `False` otherwise."""
         cdef int ierr, n, numunlimdims, ndims, nvars, ngatts, xdimid
         cdef int *unlimdimids
         with nogil:
-            ierr = ncmpi_inq(self._fileid, &ndims, &nvars, &ngatts, &xdimid)
+            ierr = ncmpi_inq(self._file_id, &ndims, &nvars, &ngatts, &xdimid)
         if self._id == xdimid:
             return True
         else:

@@ -1,7 +1,7 @@
 from ._File cimport File
 
 cdef class Dimension:
-    cdef public int _id, _fileid
+    cdef public int _id, _file_id
     cdef public File _file
     cdef public _name, _data_model
 
